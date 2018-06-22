@@ -6,6 +6,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.UIManager;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import javazoom.jl.player.Player;
 import playermp3.Music;
@@ -127,15 +128,14 @@ public class PlayerGUI {
 		btnAddSong.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//Caminho da musica
-				if (open()) {
-					songs.addElement(new Music(songFile.getAbsolutePath(),songFile.getName()));
-					names.addElement(songFile.getName());
+				if (open() != -1) {
+					
 					listMusicLibrary.setModel(names);
 					listMusicLibrary.repaint();
 				}
 			}
 		});
-		btnAddSong.setBounds(10, 60, 89, 23);
+		btnAddSong.setBounds(10, 61, 105, 23);
 		frmPlayermp.getContentPane().add(btnAddSong);
 		
 		JButton btnPlay = new JButton("PLay");
@@ -158,7 +158,7 @@ public class PlayerGUI {
 					
 				} catch (Exception e) {
 					
-					JOptionPane.showMessageDialog(null,"Erro ao reproduzir", "ERRO", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(null,"A lista de músicas está vazia", "ERRO", JOptionPane.ERROR_MESSAGE);
 				}
 				
 			}
@@ -211,7 +211,7 @@ public class PlayerGUI {
 					
 				} catch (Exception e) {
 					
-					JOptionPane.showMessageDialog(null,"Erro ao reproduzir", "ERRO", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(null,"A lista de músicas está vazia", "ERRO", JOptionPane.ERROR_MESSAGE);
 				}
 				
 				
@@ -225,7 +225,7 @@ public class PlayerGUI {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				
-try {
+				try {
 					
 					if(listMusicLibrary.getSelectedValue()==null) {
 						
@@ -235,16 +235,16 @@ try {
 					}else {
 						
 						Resource.stop();
-						int next = (Math.abs(listMusicLibrary.getSelectedIndex()-1)) % listMusicLibrary.getModel().getSize();
+						int prev = (Math.abs(listMusicLibrary.getSelectedIndex()-1)) % listMusicLibrary.getModel().getSize();
 						
-						Resource.play(songs.getElementAt(next).getMusicPath());
-						listMusicLibrary.setSelectedIndex(next);
+						Resource.play(songs.getElementAt(prev).getMusicPath());
+						listMusicLibrary.setSelectedIndex(prev);
 						
 					}
 					
 				} catch (Exception ex) {
 					
-					JOptionPane.showMessageDialog(null,"Erro ao reproduzir", "ERRO", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(null,"A lista de músicas está vazia", "ERRO", JOptionPane.ERROR_MESSAGE);
 				}
 				
 				
@@ -253,46 +253,103 @@ try {
 		btnPrev.setBounds(164, 351, 69, 23);
 		frmPlayermp.getContentPane().add(btnPrev);
 		
+		/**
+		 * Botão remover músicas
+		 */
 		JButton btnRemMsica = new JButton("Rem M\u00FAsica");
 		btnRemMsica.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
-			
+				try {
+				if( listMusicLibrary.getSelectedValue() == null) {
+					
+					throw new NoSuchFieldException() ;
+				}
+				int i = Resource.deleteSong("txtFiles//songs.txt", listMusicLibrary.getSelectedValue());
+				Resource.deleteSong("txtFiles//songsPaths.txt", songs.getElementAt(listMusicLibrary.getSelectedIndex()).getMusicPath());
+				
+				if(i!= -1) {
+					names.removeElementAt(i);
+					songs.removeElementAt(i);
+					listMusicLibrary.repaint();
+				}
+				}catch(Exception e) {
+					
+					JOptionPane.showMessageDialog(null,"Selecione um arquivo para poder deletá-lo", "Arquivo não selecionado", JOptionPane.WARNING_MESSAGE);
+					
+				}
 			}
 		});
-		btnRemMsica.setBounds(10, 94, 89, 23);
+		btnRemMsica.setBounds(10, 94, 105, 23);
 		frmPlayermp.getContentPane().add(btnRemMsica);
+		
+		JButton btnAddDirectory = new JButton("Add Diret\u00F3rio");
+		btnAddDirectory.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				JFileChooser chooser = new JFileChooser();
+				chooser.setFileFilter(new FileNameExtensionFilter("MP3 files", "mp3"));
+				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY );
+	            chooser.showOpenDialog(null);
+	           
+	            File file = new File(chooser.getSelectedFile().getAbsolutePath());
+	            
+	            File aFile[] = file.listFiles();
+	            
+	            for (int i = 0; i < aFile.length;  i++) {
+	            	
+	            	songFile = aFile[i];	
+	    			
+					
+					if(!names.contains(songFile.getName())) {
+					
+						songs.addElement(new Music(songFile.getAbsolutePath(),songFile.getName()));
+						names.addElement(songFile.getName());
+						refreshMusicList();	
+					
+					}
+	                
+	            }
+			}
+		});
+		btnAddDirectory.setBounds(10, 124, 105, 23);
+		frmPlayermp.getContentPane().add(btnAddDirectory);
 		
 			
 		
 	}
 	
-	private boolean open() {
+	private int open() {
 		try {
 				
-			JFileChooser chooser = new JFileChooser();
-			
+			JFileChooser chooser = new JFileChooser("D:\\Músicas");
 			chooser.setDialogTitle("Escolha de arquivo");
+			chooser.setFileFilter(new FileNameExtensionFilter("Music files", "mp3"));
+			chooser.setAcceptAllFileFilterUsed(false);
+			chooser.setMultiSelectionEnabled(true);
 			chooser.showOpenDialog(null);
-			songFile = chooser.getSelectedFile();
-
-			if(!songFile.getName().endsWith(".mp3")) {
-				JOptionPane.showMessageDialog(null,"Arquivo selecionado não tem formato mp3!", "ERRO", JOptionPane.ERROR_MESSAGE);
-				open();
+			
+			File selectedFiles[] = chooser.getSelectedFiles();
+			
+			for (int i = 0; i < selectedFiles.length; i++) {
 				
-			}else if(names.contains(songFile.getName())) {
+				songFile = selectedFiles[i];	
+			
 				
-				JOptionPane.showMessageDialog(null,"A lista já contém o arquivo", "ERRO", JOptionPane.ERROR_MESSAGE);
+				if(!names.contains(songFile.getName())) {
 				
-				return false;
+					songs.addElement(new Music(songFile.getAbsolutePath(),songFile.getName()));
+					names.addElement(songFile.getName());
+					refreshMusicList();	
+				
+				}
 				
 			}
-			refreshMusicList();
-			
 		} catch (Exception e2) {
 			JOptionPane.showMessageDialog(null,"Nenhum arquivo selecionado", "ERRO", JOptionPane.ERROR_MESSAGE);
 		}
-		return true;
+		
+		return JOptionPane.CLOSED_OPTION;
 	}
 	
 	

@@ -2,6 +2,7 @@ package playermp3;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -136,11 +137,47 @@ public class Resource {
 		}.start();
 		
 	}
-	
+	/**
+	 * 
+	 * @param pathOfSongFile
+	 * @param fileToDelete
+	 * @return
+	 */
 	public static int deleteSong(String pathOfSongFile, String fileToDelete) {
-		return 0;
+		
+		int index = -1;
+		ArrayList<String> content = readFile(pathOfSongFile);
+		
+		if(content.contains(fileToDelete)){
+			index = content.indexOf(fileToDelete);
+			content.remove(fileToDelete);			
+		}
+		
+		if(index != -1) {
+			try {
+				FileWriter fileWriter = new FileWriter(pathOfSongFile, false);
+				fileWriter.write("");
+				fileWriter.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		
+		   for (int i = 0; i < content.size(); i++) {
+	
+			   writeInFile(pathOfSongFile,content.get(i));
+		   }	
+		   return index;
+		}
+		
+		return index;
 	}
 	
+	/**
+	 * 
+	 * @param filePath
+	 * @return
+	 */
 	public static ArrayList<String> readFile(String filePath) {
 		
 		try {
@@ -163,7 +200,12 @@ public class Resource {
 		return null;
 		
 	}
-	
+	/**
+	 * 
+	 * @param filePath
+	 * @param content
+	 * @return
+	 */
 	public static String writeInFile(String filePath, String content) {
 		try {
 			
