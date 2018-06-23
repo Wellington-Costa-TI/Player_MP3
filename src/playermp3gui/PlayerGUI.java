@@ -45,14 +45,19 @@ import javax.swing.JTextArea;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
 import javax.swing.JScrollBar;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.JMenuBar;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 
 public class PlayerGUI {
 
 	private JFrame frmPlayermp;
 	private File songFile;
 	
-	private DefaultListModel<Music> songs = new DefaultListModel<Music>();
+	private ArrayList<Music> songs = new ArrayList<Music>();
 	private DefaultListModel<String> names = new DefaultListModel<String>();
+	
 	
 	/**
 	 * Launch the application.
@@ -99,30 +104,43 @@ public class PlayerGUI {
 		lblNomeDaPlaylist.setBounds(425, 17, 89, 14);
 		frmPlayermp.getContentPane().add(lblNomeDaPlaylist);
 		
-		JLabel lblMsicas = new JLabel("M\u00FAsicas");
-		lblMsicas.setBounds(224, 17, 46, 14);
+		JLabel lblMsicas = new JLabel("Biblioteca de M\u00FAsicas");
+		lblMsicas.setHorizontalAlignment(SwingConstants.CENTER);
+		lblMsicas.setBounds(167, 17, 157, 14);
 		frmPlayermp.getContentPane().add(lblMsicas);
 		
 		JButton btnAddPlaylist = new JButton("add playlist");
 		btnAddPlaylist.setBounds(623, 351, 123, 23);
 		frmPlayermp.getContentPane().add(btnAddPlaylist);
+		//Chamada da Função que carrega os dados para o sistema.
+		startMusicList();
+		
+		JScrollPane scrollPaneMusicLibrary = new JScrollPane();
+		scrollPaneMusicLibrary.setBounds(167, 44, 159, 296);
+		frmPlayermp.getContentPane().add(scrollPaneMusicLibrary);
+		
 		
 		JList<String> listMusicLibrary = new JList<String>();
+		scrollPaneMusicLibrary.setViewportView(listMusicLibrary);
 		listMusicLibrary.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		listMusicLibrary.setBounds(167, 44, 159, 296);
-		frmPlayermp.getContentPane().add(listMusicLibrary);
-		startMusicList();
 		listMusicLibrary.setModel(names);
 		listMusicLibrary.repaint();
 		
+		JScrollPane scrollPanePlaylistsSongs = new JScrollPane();
+		scrollPanePlaylistsSongs.setBounds(388, 44, 159, 296);
+		frmPlayermp.getContentPane().add(scrollPanePlaylistsSongs);
+		
+		
 		
 		JList listPlayistsNames = new JList();
-		listPlayistsNames.setBounds(388, 44, 159, 296);
-		frmPlayermp.getContentPane().add(listPlayistsNames);
+		scrollPanePlaylistsSongs.setViewportView(listPlayistsNames);
+		
+		JScrollPane scrollPanePlaylists = new JScrollPane();
+		scrollPanePlaylists.setBounds(613, 153, 133, 183);
+		frmPlayermp.getContentPane().add(scrollPanePlaylists);
 		
 		JList listPlaylists = new JList();
-		listPlaylists.setBounds(613, 153, 133, 183);
-		frmPlayermp.getContentPane().add(listPlaylists);
+		scrollPanePlaylists.setViewportView(listPlaylists);
 		
 		JButton btnAddSong = new JButton("Add M\u00FAsica");
 		btnAddSong.addActionListener(new ActionListener() {
@@ -130,7 +148,6 @@ public class PlayerGUI {
 				//Caminho da musica
 				if (open() != -1) {
 					
-					listMusicLibrary.setModel(names);
 					listMusicLibrary.repaint();
 				}
 			}
@@ -146,13 +163,15 @@ public class PlayerGUI {
 					
 					if(listMusicLibrary.getSelectedValue()==null) {
 						
-						Resource.play(songs.getElementAt(0).getMusicPath());
+						Resource.play(songs.get(0).getMusicPath());
 						listMusicLibrary.setSelectedIndex(0);
+						Resource.writeInFile("txtFiles//teste.txt", songs.get(0).getMusicPath());
 						
 					}else {
 						
 						Resource.stop();
-						Resource.play(songs.getElementAt(listMusicLibrary.getSelectedIndex()).getMusicPath());
+						Resource.play(songs.get(listMusicLibrary.getSelectedIndex()).getMusicPath());
+						Resource.writeInFile("txtFiles//teste.txt", songs.get(listMusicLibrary.getSelectedIndex()).getMusicPath());
 						
 					}
 					
@@ -172,6 +191,7 @@ public class PlayerGUI {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				Resource.pause();
+			
 			}
 		});
 		btnPause.setBounds(398, 351, 69, 23);
@@ -196,7 +216,7 @@ public class PlayerGUI {
 					
 					if(listMusicLibrary.getSelectedValue()==null) {
 						
-						Resource.play(songs.getElementAt(0).getMusicPath());
+						Resource.play(songs.get(0).getMusicPath());
 						listMusicLibrary.setSelectedIndex(0);
 						
 					}else {
@@ -204,7 +224,7 @@ public class PlayerGUI {
 						Resource.stop();
 						int next = (listMusicLibrary.getSelectedIndex()+1) % listMusicLibrary.getModel().getSize();
 						
-						Resource.play(songs.getElementAt(next).getMusicPath());
+						Resource.play(songs.get(next).getMusicPath());
 						listMusicLibrary.setSelectedIndex(next);
 						
 					}
@@ -229,7 +249,7 @@ public class PlayerGUI {
 					
 					if(listMusicLibrary.getSelectedValue()==null) {
 						
-						Resource.play(songs.getElementAt(songs.size()-1).getMusicPath());
+						Resource.play(songs.get(songs.size()-1).getMusicPath());
 						listMusicLibrary.setSelectedIndex(0);
 						
 					}else {
@@ -237,7 +257,7 @@ public class PlayerGUI {
 						Resource.stop();
 						int prev = (Math.abs(listMusicLibrary.getSelectedIndex()-1)) % listMusicLibrary.getModel().getSize();
 						
-						Resource.play(songs.getElementAt(prev).getMusicPath());
+						Resource.play(songs.get(prev).getMusicPath());
 						listMusicLibrary.setSelectedIndex(prev);
 						
 					}
@@ -265,13 +285,14 @@ public class PlayerGUI {
 					
 					throw new NoSuchFieldException() ;
 				}
-				int i = Resource.deleteSong("txtFiles//songs.txt", listMusicLibrary.getSelectedValue());
-				Resource.deleteSong("txtFiles//songsPaths.txt", songs.getElementAt(listMusicLibrary.getSelectedIndex()).getMusicPath());
+				int i = Resource.deleteSong("txtFiles//songs.txt", listMusicLibrary.getSelectedValue()+";"+songs.get(listMusicLibrary.getSelectedIndex()).getMusicPath());
 				
 				if(i!= -1) {
 					names.removeElementAt(i);
-					songs.removeElementAt(i);
+					songs.remove(songs.get(i));
+					listMusicLibrary.setSelectedIndex(i);
 					listMusicLibrary.repaint();
+					
 				}
 				}catch(Exception e) {
 					
@@ -287,33 +308,16 @@ public class PlayerGUI {
 		btnAddDirectory.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				JFileChooser chooser = new JFileChooser();
-				chooser.setFileFilter(new FileNameExtensionFilter("MP3 files", "mp3"));
-				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY );
-	            chooser.showOpenDialog(null);
-	           
-	            File file = new File(chooser.getSelectedFile().getAbsolutePath());
-	            
-	            File aFile[] = file.listFiles();
-	            
-	            for (int i = 0; i < aFile.length;  i++) {
-	            	
-	            	songFile = aFile[i];	
-	    			
+				if (openDirectory() != -1) {
 					
-					if(!names.contains(songFile.getName())) {
-					
-						songs.addElement(new Music(songFile.getAbsolutePath(),songFile.getName()));
-						names.addElement(songFile.getName());
-						refreshMusicList();	
-					
-					}
-	                
-	            }
+					listMusicLibrary.repaint();
+				}
 			}
 		});
 		btnAddDirectory.setBounds(10, 124, 105, 23);
 		frmPlayermp.getContentPane().add(btnAddDirectory);
+		
+		
 		
 			
 		
@@ -338,7 +342,7 @@ public class PlayerGUI {
 				
 				if(!names.contains(songFile.getName())) {
 				
-					songs.addElement(new Music(songFile.getAbsolutePath(),songFile.getName()));
+					songs.add(new Music(songFile.getAbsolutePath(),songFile.getName()));
 					names.addElement(songFile.getName());
 					refreshMusicList();	
 				
@@ -352,17 +356,49 @@ public class PlayerGUI {
 		return JOptionPane.CLOSED_OPTION;
 	}
 	
+	private int openDirectory() {
+		try {
+			JFileChooser chooser = new JFileChooser();
+			chooser.setFileFilter(new FileNameExtensionFilter("MP3 files", "mp3"));
+			chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+			chooser.showOpenDialog(null);
+        
+        	File file = new File(chooser.getSelectedFile().getAbsolutePath());
+        
+        	File aFile[] = file.listFiles();
+        
+        	for (int i = 0; i < aFile.length;  i++) {
+        	
+        		songFile = aFile[i];	
+			
+			
+				if(!names.contains(songFile.getName()) && songFile.getAbsolutePath().endsWith(".mp3")) {
+				
+					songs.add(new Music(songFile.getAbsolutePath(),songFile.getName()));
+					names.addElement(songFile.getName());
+					refreshMusicList();	
+				
+				}
+            
+        	}
+		}catch (Exception e2) {
+			JOptionPane.showMessageDialog(null,"Nenhum diretório selecionado", "ERRO", JOptionPane.ERROR_MESSAGE);
+		}
+		return JOptionPane.CLOSED_OPTION;
+	}
 	
 	private void startMusicList() {
 		try {
 			
 			ArrayList<String> musics = Resource.readFile("txtFiles\\songs.txt");
-			ArrayList<String> musicsPaths = Resource.readFile("txtFiles\\songsPaths.txt");
+			
 			
 			for (int i = 0; i < musics.size(); i++) {
 				
-				songs.addElement(new Music(musicsPaths.get(i),musics.get(i)));
-				names.addElement(musics.get(i));
+				String[] nameNpath = musics.get(i).split(";");
+				
+				songs.add(new Music(nameNpath[1],nameNpath[0]));
+				names.addElement(nameNpath[0]);
 				
 			}
 		
@@ -371,7 +407,6 @@ public class PlayerGUI {
 		}
 	}
 	private void refreshMusicList() {
-		Resource.writeInFile("txtFiles\\songsPaths.txt", songFile.getAbsolutePath());
-		Resource.writeInFile("txtFiles\\songs.txt", songFile.getName());
+		Resource.writeInFile("txtFiles\\songs.txt", songFile.getName()+";"+songFile.getAbsolutePath());
 	}
 }

@@ -60,7 +60,7 @@ public class Resource {
 	}
 	
 	/**
-	 * 
+	 * not so used
 	 */
 	public static void resume() {
 		try {

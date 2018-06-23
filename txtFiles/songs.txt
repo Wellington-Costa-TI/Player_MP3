@@ -1,25 +1,6 @@
-01 Quebra-Mar.mp3
-03 Zóio de Lula.mp3
-04 Vícios E Virtues.mp3
-06 O Preco.mp3
-02 O Que É da Casa É da Casa-Papo Reto (Prazer É Sexo O Resto É Negocio).mp3
-05 Hoje.mp3
-07 Tudo Pro Alto.mp3
-08 Não Uso Sapato.mp3
-09 O Coro Vai Comê!.mp3
-10 Tudo O Que Ela Gosta de Escutar.mp3
-11 Não É Sério.mp3
-12 Vinheta Beat Box II-Como Tudo Deve Ser.mp3
-13 A Banca.mp3
-14 Samba Makossa.mp3
-15 Quinta-Feira.mp3
-16 So Por Uma Noite.mp3
-17 Oba lá Vem Ela.mp3
-18 Tudo Mudar.mp3
-19 Proibida Pra Mim (Grazon).mp3
-20 Charlie Brown Jr.mp3
-AlbumArtSmall.jpg
-AlbumArt_{848EDEEA-38B2-4A01-88E5-AE22C5BF4FBC}_Large.jpg
-AlbumArt_{848EDEEA-38B2-4A01-88E5-AE22C5BF4FBC}_Small.jpg
-desktop.ini
-Folder.jpg
+01 Quebra-Mar.mp3;D:\Músicas\Acustico\01 Quebra-Mar.mp3
+03 Zóio de Lula.mp3;D:\Músicas\Acustico\03 Zóio de Lula.mp3
+04 Vícios E Virtues.mp3;D:\Músicas\Acustico\04 Vícios E Virtues.mp3
+07 Tudo Pro Alto.mp3;D:\Músicas\Acustico\07 Tudo Pro Alto.mp3
+08 Não Uso Sapato.mp3;D:\Músicas\Acustico\08 Não Uso Sapato.mp3
+09 O Coro Vai Comê!.mp3;D:\Músicas\Acustico\09 O Coro Vai Comê!.mp3
