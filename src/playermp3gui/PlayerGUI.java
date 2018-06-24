@@ -8,48 +8,24 @@ import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import javazoom.jl.player.Player;
 import playermp3.Music;
 import playermp3.Resource;
+import registersystem.Register;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 
-import java.awt.BorderLayout;
 import javax.swing.SwingConstants;
 import javax.swing.DefaultListModel;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.JTextField;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JLabel;
-import java.awt.ScrollPane;
-import javax.swing.JTextPane;
-import javax.swing.JTextArea;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
-import javax.swing.JScrollBar;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.JMenuBar;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-
 public class PlayerGUI {
 
 	private JFrame frmPlayermp;
@@ -60,7 +36,7 @@ public class PlayerGUI {
 	
 	
 	/**
-	 * Launch the application.
+	 * Inicia a aplicação.
 	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -77,7 +53,7 @@ public class PlayerGUI {
 	}
 
 	/**
-	 * Create the application.
+	 * Cria a aplicação.
 	 */
 	public PlayerGUI() {
 	
@@ -86,7 +62,7 @@ public class PlayerGUI {
 	}
 
 	/**
-	 * Initialize the contents of the frame.
+	 * Inicializa o conteúdo a ser exibido na tela.
 	 */
 	private void initialize() {
 		frmPlayermp = new JFrame();
@@ -96,6 +72,7 @@ public class PlayerGUI {
 		frmPlayermp.setLocationRelativeTo(null);
 		frmPlayermp.getContentPane().setLayout(null);
 		
+
 		JLabel lblPlaylists = new JLabel("Playlists");
 		lblPlaylists.setBounds(658, 128, 46, 14);
 		frmPlayermp.getContentPane().add(lblPlaylists);
@@ -112,6 +89,7 @@ public class PlayerGUI {
 		JButton btnAddPlaylist = new JButton("add playlist");
 		btnAddPlaylist.setBounds(623, 351, 123, 23);
 		frmPlayermp.getContentPane().add(btnAddPlaylist);
+		
 		//Chamada da Função que carrega os dados para o sistema.
 		startMusicList();
 		
@@ -128,9 +106,7 @@ public class PlayerGUI {
 		
 		JScrollPane scrollPanePlaylistsSongs = new JScrollPane();
 		scrollPanePlaylistsSongs.setBounds(388, 44, 159, 296);
-		frmPlayermp.getContentPane().add(scrollPanePlaylistsSongs);
-		
-		
+		frmPlayermp.getContentPane().add(scrollPanePlaylistsSongs);	
 		
 		JList listPlayistsNames = new JList();
 		scrollPanePlaylistsSongs.setViewportView(listPlayistsNames);
@@ -146,7 +122,7 @@ public class PlayerGUI {
 		btnAddSong.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//Caminho da musica
-				if (open() != -1) {
+				if (addSongs() != -1) {
 					
 					listMusicLibrary.repaint();
 				}
@@ -273,9 +249,6 @@ public class PlayerGUI {
 		btnPrev.setBounds(164, 351, 69, 23);
 		frmPlayermp.getContentPane().add(btnPrev);
 		
-		/**
-		 * Botão remover músicas
-		 */
 		JButton btnRemMsica = new JButton("Rem M\u00FAsica");
 		btnRemMsica.addMouseListener(new MouseAdapter() {
 			@Override
@@ -308,7 +281,7 @@ public class PlayerGUI {
 		btnAddDirectory.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				if (openDirectory() != -1) {
+				if (addDirectory() != -1) {
 					
 					listMusicLibrary.repaint();
 				}
@@ -317,13 +290,29 @@ public class PlayerGUI {
 		btnAddDirectory.setBounds(10, 124, 105, 23);
 		frmPlayermp.getContentPane().add(btnAddDirectory);
 		
+		JButton btnRegister = new JButton("Cadastrar");
+		btnRegister.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				
+				Register.main(null);
+				
+			}
+		});
+		btnRegister.setBounds(623, 13, 123, 104);
+		frmPlayermp.getContentPane().add(btnRegister);
+		
 		
 		
 			
 		
 	}
 	
-	private int open() {
+	/**
+	 * Adiciona uma ou múltiplas músicas à lista de reprodução
+	 * @return um inteiro que indica se a tela foi fechada antes da seleção de alguma música.
+	 */
+	private int addSongs() {
 		try {
 				
 			JFileChooser chooser = new JFileChooser("D:\\Músicas");
@@ -356,7 +345,11 @@ public class PlayerGUI {
 		return JOptionPane.CLOSED_OPTION;
 	}
 	
-	private int openDirectory() {
+	/**
+	 * Adiciona todas as músicas de um diretório à biblioteca de músicas
+	 * @return um inteiro que indica se a tela foi fechada antes da seleção de alguma música.
+	 */
+	private int addDirectory() {
 		try {
 			JFileChooser chooser = new JFileChooser();
 			chooser.setFileFilter(new FileNameExtensionFilter("MP3 files", "mp3"));
@@ -364,7 +357,8 @@ public class PlayerGUI {
 			chooser.showOpenDialog(null);
         
         	File file = new File(chooser.getSelectedFile().getAbsolutePath());
-        
+        	
+        	//Array do tipo File que armazena os arquivos
         	File aFile[] = file.listFiles();
         
         	for (int i = 0; i < aFile.length;  i++) {
@@ -387,6 +381,9 @@ public class PlayerGUI {
 		return JOptionPane.CLOSED_OPTION;
 	}
 	
+	/**
+	 * Carrega a lista de musicas contida no arquivo songs.txt e as coloca na lista de músicas;
+	 */
 	private void startMusicList() {
 		try {
 			
@@ -406,6 +403,9 @@ public class PlayerGUI {
 			e.getStackTrace();
 		}
 	}
+	/**
+	 * Atualiza as musicas do arquivo songs.txt
+	 */
 	private void refreshMusicList() {
 		Resource.writeInFile("txtFiles\\songs.txt", songFile.getName()+";"+songFile.getAbsolutePath());
 	}

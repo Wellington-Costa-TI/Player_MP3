@@ -2,7 +2,6 @@ package playermp3;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -104,7 +103,7 @@ public class Resource {
 	 */
 	public static void play(String songPath) {
 		try {
-			
+		
 			fis = new FileInputStream(songPath);
 			bis = new BufferedInputStream(fis);
 			
@@ -138,10 +137,10 @@ public class Resource {
 		
 	}
 	/**
-	 * 
-	 * @param pathOfSongFile
-	 * @param fileToDelete
-	 * @return
+	 * Remove a música da lista e dos arquivos base.
+	 * @param pathOfSongFile Caminho do diretório da musica que será deletada.
+	 * @param fileToDelete Nome da música que será deletada.
+	 * @return Um inteiro que representa a posição da música na lista.
 	 */
 	public static int deleteSong(String pathOfSongFile, String fileToDelete) {
 		
@@ -174,9 +173,9 @@ public class Resource {
 	}
 	
 	/**
-	 * 
-	 * @param filePath
-	 * @return
+	 * Lê um arquivo .txt 
+	 * @param filePath Diretório do arquivo a ser lido.
+	 * @return Um ArrayList com o conteúdo do arquivo.
 	 */
 	public static ArrayList<String> readFile(String filePath) {
 		
@@ -201,12 +200,11 @@ public class Resource {
 		
 	}
 	/**
-	 * 
-	 * @param filePath
-	 * @param content
-	 * @return
+	 * Escreve em um arquivo .txt
+	 * @param filePath Diretório do arquivo a ser escrito.
+	 * @param content conteúdo que será escrito no diretório.
 	 */
-	public static String writeInFile(String filePath, String content) {
+	public static void writeInFile(String filePath, String content) {
 		try {
 			
 			FileWriter fileWriter = new FileWriter(filePath, true);
@@ -220,7 +218,6 @@ public class Resource {
 		
 		writer.println(content);
 		writer.close();
-		return content;
 	}
 	
 }
